@@ -1,10 +1,10 @@
 ﻿var input = File.ReadAllLines("input.txt");
-var currentCalories = 0;
 
 // ============================
 // ========== PART 1 ==========
 // ============================
 
+var currentCalories = 0;
 var maxCalories = 0;
 
 foreach (var line in input)
