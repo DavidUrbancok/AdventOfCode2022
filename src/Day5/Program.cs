@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-var input = File.ReadAllLines("input.txt");
+﻿var input = File.ReadAllLines("input.txt");
 
 // ============================
 // ========== PART 1 ==========
