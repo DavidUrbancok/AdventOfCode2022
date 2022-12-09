@@ -63,7 +63,7 @@ foreach (var line in input)
 
 Console.WriteLine(visited.Count);
 
-static void HandleMovement(ref int point, int diff)
+static void HandleSingleMovement(ref int point, int diff)
 {
     if (diff < 0)
     {
@@ -75,7 +75,7 @@ static void HandleMovement(ref int point, int diff)
     }
 }
 
-void ProcessMovement(Point head, Point tail)
+void ProcessMovement(Point head, Point tail, bool recordPosition = true)
 {
     var horizontalDiff = head.X - tail.X;
     var verticalDiff = head.Y - tail.Y;
@@ -83,21 +83,24 @@ void ProcessMovement(Point head, Point tail)
     if (Math.Abs(horizontalDiff) == 2 && Math.Abs(verticalDiff) == 1
         || Math.Abs(horizontalDiff) == 1 && Math.Abs(verticalDiff) == 2)
     {
-        HandleMovement(ref tail.X, horizontalDiff);
-        HandleMovement(ref tail.Y, verticalDiff);
+        HandleSingleMovement(ref tail.X, horizontalDiff);
+        HandleSingleMovement(ref tail.Y, verticalDiff);
     }
 
     if (Math.Abs(horizontalDiff) == 2 && Math.Abs(verticalDiff) == 0)
     {
-        HandleMovement(ref tail.X, horizontalDiff);
+        HandleSingleMovement(ref tail.X, horizontalDiff);
     }
 
     if (Math.Abs(horizontalDiff) == 0 && Math.Abs(verticalDiff) == 2)
     {
-        HandleMovement(ref tail.Y, verticalDiff);
+        HandleSingleMovement(ref tail.Y, verticalDiff);
     }
 
-    visited.Add(new Tuple(tail.X, tail.Y));
+    if (recordPosition)
+    {
+        visited.Add(new Tuple(tail.X, tail.Y));
+    }
 }
 
 internal record Tuple(int X, int Y);
