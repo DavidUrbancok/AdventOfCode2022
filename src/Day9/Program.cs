@@ -4,110 +4,75 @@
 // ========== PART 1 ==========
 // ============================
 
-var visited = new HashSet<Tuple>();
+ISet<Knot> visited = new HashSet<Knot>();
 
-var snakeHead = new Point { X = 0, Y = 0 };
-var snakeTail = new Point { X = 0, Y = 0 };
+static void MoveHead(IList<Knot> rope, string direction)
+{
+    rope[0] = direction switch
+    {
+        "U" => rope[0] with { X = rope[0].X - 1 },
+        "D" => rope[0] with { X = rope[0].X + 1 },
+        "L" => rope[0] with { Y = rope[0].Y - 1 },
+        "R" => rope[0] with { Y = rope[0].Y + 1 },
+        _ => throw new InvalidOperationException(direction)
+    };
 
+    for (var i = 1; i < rope.Count; i++)
+    {
+        var xDistance = rope[i - 1].X - rope[i].X;
+        var yDistance = rope[i - 1].Y - rope[i].Y;
+
+        if (Math.Abs(xDistance) > 1 || Math.Abs(yDistance) > 1)
+        {
+            rope[i] = new Knot(
+                rope[i].X + Math.Sign(xDistance),
+                rope[i].Y + Math.Sign(yDistance)
+            );
+        }
+    }
+}
+
+var rope = Enumerable.Repeat(new Knot(0, 0), 2).ToArray();
+visited.Add(rope.Last());
 
 foreach (var line in input)
 {
-    var strings = line.Split(' ');
-    var direction = strings[0];
-    var amount = int.Parse(strings[1]);
+    var parts = line.Split(' ');
+    var dir = parts[0];
+    var distance = int.Parse(parts[1]);
 
-    switch (direction)
+    for (var i = 0; i < distance; i++)
     {
-        case "U":
-        {
-            for (var i = 0; i < amount; i++)
-            {
-                snakeHead.Y++;
-                ProcessMovement(snakeHead, snakeTail);
-            }
-
-            break;
-        }
-        case "D":
-        {
-            for (var i = 0; i < amount; i++)
-            {
-                snakeHead.Y--;
-                ProcessMovement(snakeHead, snakeTail);
-            }
-
-            break;
-        }
-        case "L":
-        {
-            for (var i = 0; i < amount; i++)
-            {
-                snakeHead.X--;
-                ProcessMovement(snakeHead, snakeTail);
-            }
-
-            break;
-        }
-        case "R":
-        {
-            for (var i = 0; i < amount; i++)
-            {
-                snakeHead.X++;
-                ProcessMovement(snakeHead, snakeTail);
-            }
-
-            break;
-        }
+        MoveHead(rope, dir);
+        visited.Add(rope.Last());
     }
 }
 
 Console.WriteLine(visited.Count);
 
-static void HandleSingleMovement(ref int point, int diff)
+
+// ============================
+// ========== PART 2 ==========
+// ============================
+
+
+visited.Clear();
+rope = Enumerable.Repeat(new Knot(0, 0), 10).ToArray();
+visited.Add(rope.Last());
+
+foreach (var line in input)
 {
-    if (diff < 0)
+    var parts = line.Split(' ');
+    var dir = parts[0];
+    var distance = int.Parse(parts[1]);
+
+    for (var i = 0; i < distance; i++)
     {
-        point--;
-    }
-    else
-    {
-        point++;
+        MoveHead(rope, dir);
+        visited.Add(rope.Last());
     }
 }
 
-void ProcessMovement(Point head, Point tail, bool recordPosition = true)
-{
-    var horizontalDiff = head.X - tail.X;
-    var verticalDiff = head.Y - tail.Y;
+Console.WriteLine(visited.Count);
 
-    if (Math.Abs(horizontalDiff) == 2 && Math.Abs(verticalDiff) == 1
-        || Math.Abs(horizontalDiff) == 1 && Math.Abs(verticalDiff) == 2)
-    {
-        HandleSingleMovement(ref tail.X, horizontalDiff);
-        HandleSingleMovement(ref tail.Y, verticalDiff);
-    }
-
-    if (Math.Abs(horizontalDiff) == 2 && Math.Abs(verticalDiff) == 0)
-    {
-        HandleSingleMovement(ref tail.X, horizontalDiff);
-    }
-
-    if (Math.Abs(horizontalDiff) == 0 && Math.Abs(verticalDiff) == 2)
-    {
-        HandleSingleMovement(ref tail.Y, verticalDiff);
-    }
-
-    if (recordPosition)
-    {
-        visited.Add(new Tuple(tail.X, tail.Y));
-    }
-}
-
-internal record Tuple(int X, int Y);
-
-internal class Point
-{
-    internal int X;
-
-    internal int Y;
-}
+internal record struct Knot(int X, int Y);
